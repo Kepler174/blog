@@ -3,7 +3,7 @@ name: Hexo Deploy to Server
 on:
   push:
     branches:
-      - main  # 监听 main 分支
+      - main
 
 jobs:
   build:
@@ -27,13 +27,12 @@ jobs:
     - name: Build Hexo
       run: npx hexo generate
 
-    - name: Deploy to Server via SSH
-      uses: easingthemes/ssh-deploy@main
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        ARGS: "-rltgoDzvO"
-        SOURCE: "public/"
-        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-        REMOTE_USER: ${{ secrets.REMOTE_USER }}
-        TARGET: ${{ secrets.REMOTE_TARGET }}
-        EXCLUDE: "/dist/, /node_modules/"
+    - name: Deploy to Server via SCP
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "public/*"
+        target: ${{ secrets.REMOTE_TARGET }}
+        strip_components: 1
